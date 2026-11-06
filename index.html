@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ACSNN — Atomic Collision Surrogate Neural Network</title>
+<meta name="description" content="Neural-network predictions of total single-ionization cross sections of atomic hydrogen by bare-ion impact (CDW-EIS, CTMC, Rudd semiempirical model).">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar"><div class="inner">
+  <a class="brand" href="#top">ACSNN<span>.</span></a>
+  <nav data-i18n-aria="nav.label" aria-label="Sections">
+    <a href="#calc" data-i18n="nav.calc">Calculator</a>
+    <a href="#theories" data-i18n="nav.theories">Theories</a>
+    <a href="#network" data-i18n="nav.network">The network</a>
+    <a href="#data" data-i18n="nav.data">Experimental data</a>
+    <a href="#cite" data-i18n="nav.cite">How to cite</a>
+  </nav>
+  <div class="lang-switch" role="group" data-i18n-aria="lang.label" aria-label="Language">
+    <button type="button" data-lang="es" aria-pressed="true"><svg class="flag" viewBox="0 0 18 12" aria-hidden="true"><rect width="18" height="12" fill="#74acdf"/><rect y="4" width="18" height="4" fill="#fff"/><circle cx="9" cy="6" r="1.4" fill="#f6b40e"/></svg>ES</button><button type="button" data-lang="en" aria-pressed="false"><svg class="flag" viewBox="0 0 60 30" preserveAspectRatio="none" aria-hidden="true"><clipPath id="ukc"><path d="M30,15h30v15zv15h-30zh-30v-15zv-15h30z"/></clipPath><rect width="60" height="30" fill="#012169"/><path d="M0,0 60,30M60,0 0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 60,30M60,0 0,30" clip-path="url(#ukc)" stroke="#c8102e" stroke-width="4"/><path d="M30,0v30M0,15h60" stroke="#fff" stroke-width="10"/><path d="M30,0v30M0,15h60" stroke="#c8102e" stroke-width="6"/></svg>EN</button>
+  </div>
+</div></div>
+
+<header class="hero" id="top"><div class="inner">
+  <p class="kicker" data-i18n="hero.kicker">Neural-network surrogate · Open source</p>
+  <h1>ACSNN</h1>
+  <p class="full">Atomic Collision Surrogate Neural Network</p>
+  <p class="tagline" data-i18n-html="hero.tagline">Total cross sections for ionization of atomic hydrogen by bare-ion impact.</p>
+  <p class="lede" data-i18n-html="hero.lede"></p>
+  <div class="btns">
+    <a class="btn primary" href="#calc" data-i18n="hero.toCalc">Go to the calculator</a>
+    <a class="btn" href="https://github.com/juanmontiz/ACSNN_Calculator" target="_blank" rel="noopener">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      <span data-i18n="hero.github">Source code on GitHub</span></a>
+    <a class="btn" href="#cite" data-i18n="hero.cite">How to cite</a>
+  </div>
+  <div class="facts">
+    <div class="fact"><b>3</b><span data-i18n="fact.theories">theories: CDW-EIS, CTMC, Rudd</span></div>
+    <div class="fact"><b>Z<sub>P</sub> = 1–9</b><span data-i18n="fact.zp">bare ions on H</span></div>
+    <div class="fact"><b>1 keV/u – 100 MeV/u</b><span data-i18n="fact.range">training range</span></div>
+    <div class="fact"><b>&lt; 5 %</b><span data-i18n="fact.error">network error vs. the theories</span></div>
+    <div class="fact"><b>MIT</b><span data-i18n="fact.license">license · nothing to install</span></div>
+  </div>
+</div></header>
+
+<main>
+<!-- ================= Calculator ================= -->
+<section class="block calc" id="calc">
+  <p class="eyebrow" data-i18n="calc.eyebrow">Calculator</p>
+  <h2 data-i18n="calc.title">Compute and compare cross sections</h2>
+
+  <div class="calc-bar">
+    <div class="f"><span class="lbl" id="theory-lbl" data-i18n="calc.theory">Theory</span>
+      <div class="seg" id="theory-seg" role="group" aria-labelledby="theory-lbl">
+        <button type="button" data-v="CDW-EIS" aria-pressed="true">CDW-EIS</button><button type="button" data-v="CTMC" aria-pressed="false">CTMC</button><button type="button" data-v="Semiempiric_1985Rudd" aria-pressed="false">Rudd</button>
+      </div></div>
+    <div class="f zp"><label for="zp" data-i18n-html="calc.zp">Projectile charge Z<sub>P</sub></label>
+      <div class="row"><input type="range" id="zp" min="1" max="9" value="1"><span class="val" id="zp-val">1</span></div></div>
+    <div class="f"><span class="lbl" data-i18n="calc.target">Target</span><div class="fixed" data-i18n-html="calc.targetValue">H (Z<sub>T</sub> = 1)</div></div>
+    <div class="f"><span class="lbl" data-i18n="calc.energy">Energy (keV/u)</span>
+      <div class="row"><input type="number" id="emin" value="10" min="0" step="any" data-i18n-aria="calc.emin" aria-label="Minimum energy">
+        <span>–</span><input type="number" id="emax" value="10000" min="0" step="any" data-i18n-aria="calc.emax" aria-label="Maximum energy"></div></div>
+    <div class="grow"></div>
+    <div class="f"><button type="button" class="btn-main" id="add" data-i18n="calc.add">+ Add to plot</button></div>
+  </div>
+  <p class="hint-line" id="zp-hint"></p>
+
+  <div class="calc-row2">
+    <div id="chips"></div>
+    <button type="button" class="btn-ghost" id="clear" data-i18n="calc.clear">Clear all</button>
+    <div class="right">
+      <label class="check"><input type="checkbox" id="show-exp"> <span data-i18n="calc.showExp">Experimental data</span></label>
+      <label class="check"><input type="checkbox" id="show-bounds" checked> <span data-i18n="calc.showBounds">Training-range limits</span></label>
+      <button type="button" class="btn-ghost" id="gear" aria-expanded="false" aria-controls="drawer" data-i18n="calc.appearance">⚙ Appearance</button>
+    </div>
+  </div>
+
+  <div id="placeholder" data-i18n="plot.placeholder">Choose a theory and a charge, then press “+ Add to plot”.</div>
+  <div class="figure" id="figure" hidden>
+    <div id="plot"></div>
+    <div class="downloads">
+      <button type="button" class="btn-ghost" id="dl-png">PNG</button>
+      <button type="button" class="btn-ghost" id="dl-pdf">PDF</button>
+      <button type="button" class="btn-ghost" id="dl-svg">SVG</button>
+      <button type="button" class="btn-ghost" id="dl-csv" data-i18n="dl.csv">CSV (data)</button>
+    </div>
+  </div>
+  <p class="cap" data-i18n="calc.note">Dotted lines mark each theory's training range; outside it the curve is not drawn.</p>
+</section>
+
+<!-- ================= Theories ================= -->
+<section class="block" id="theories">
+  <p class="eyebrow" data-i18n="th.eyebrow">The theories</p>
+  <h2 data-i18n="th.title">Three models, each in its own regime</h2>
+  <p class="intro" data-i18n="th.intro"></p>
+  <div class="grid-3">
+    <article class="tcard" style="--c: var(--c-cdw)">
+      <h3>CDW-EIS</h3>
+      <p class="long">Continuum Distorted Wave – Eikonal Initial State</p>
+      <p data-i18n="th.cdw.desc"></p>
+      <dl><dt data-i18n="th.reliable">Reliable</dt><dd data-i18n-html="th.cdw.rel"></dd>
+        <dt data-i18n="th.trained">Trained</dt><dd data-i18n-html="th.cdw.tr"></dd></dl>
+      <p class="refs"><a href="https://doi.org/10.1088/0022-3700/16/17/015" target="_blank" rel="noopener">Crothers &amp; McCann (1983)</a>;
+        <a href="https://doi.org/10.1088/0953-4075/21/2/013" target="_blank" rel="noopener">Fainstein <i>et al.</i> (1988)</a></p>
+    </article>
+    <article class="tcard" style="--c: var(--c-ctmc)">
+      <h3>CTMC</h3>
+      <p class="long">Classical Trajectory Monte Carlo</p>
+      <p data-i18n="th.ctmc.desc"></p>
+      <dl><dt data-i18n="th.reliable">Reliable</dt><dd data-i18n-html="th.ctmc.rel"></dd>
+        <dt data-i18n="th.trained">Trained</dt><dd data-i18n-html="th.ctmc.tr"></dd></dl>
+      <p class="refs"><a href="https://doi.org/10.1088/0370-1328/88/4/306" target="_blank" rel="noopener">Abrines &amp; Percival (1966)</a></p>
+    </article>
+    <article class="tcard" style="--c: var(--c-rudd)">
+      <h3>Rudd</h3>
+      <p class="long" data-i18n-html="th.rudd.long"></p>
+      <p data-i18n="th.rudd.desc"></p>
+      <dl><dt data-i18n="th.reliable">Reliable</dt><dd data-i18n-html="th.rudd.rel"></dd>
+        <dt data-i18n="th.trained">Trained</dt><dd data-i18n-html="th.rudd.tr"></dd></dl>
+      <p class="refs"><a href="https://doi.org/10.1103/RevModPhys.57.965" target="_blank" rel="noopener">Rudd <i>et al.</i>, Rev. Mod. Phys. (1985)</a></p>
+    </article>
+  </div>
+  <div class="ranges">
+    <h4 data-i18n="th.ranges">Training ranges</h4>
+    <div id="range-bars"></div>
+  </div>
+  <div class="box">
+    <h4 data-i18n="th.which">Which one should I use?</h4>
+    <ul>
+      <li data-i18n-html="th.which.1"></li>
+      <li data-i18n-html="th.which.2"></li>
+      <li data-i18n-html="th.which.3"></li>
+      <li data-i18n-html="th.which.4"></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ================= Network ================= -->
+<section class="block" id="network">
+  <p class="eyebrow" data-i18n="net.eyebrow">The network</p>
+  <h2 data-i18n="net.title">One network for three theories and nine charges</h2>
+  <div class="grid-2">
+    <div>
+      <p data-i18n-html="net.text"></p>
+      <div class="key" data-i18n-html="net.key"></div>
+      <div class="stats">
+        <div class="stat"><b>17 409</b><span data-i18n="net.n.params">trainable parameters</span></div>
+        <div class="stat"><b>550</b><span data-i18n="net.n.train">training cross sections</span></div>
+        <div class="stat"><b>&lt; 5 % · &lt; 2 %</b><span data-i18n="net.n.error">error vs. CDW-EIS and CTMC · vs. Rudd</span></div>
+        <div class="stat"><b>&lt; 7 %</b><span data-i18n-html="net.n.holdout"></span></div>
+      </div>
+    </div>
+    <div class="arch">
+      <svg viewBox="0 0 520 260" role="img" data-i18n-aria="net.archAria" aria-label="Network diagram">
+        <g font-size="14" fill="#1d2433">
+          <rect x="10" y="40" width="130" height="34" rx="8" fill="#f4f6fa" stroke="#d9dee6"/><text x="75" y="62" text-anchor="middle">log₁₀ E</text>
+          <rect x="10" y="90" width="130" height="34" rx="8" fill="#f4f6fa" stroke="#d9dee6"/><text x="75" y="112" text-anchor="middle">Z<tspan baseline-shift="sub" font-size="10">P</tspan></text>
+          <rect x="10" y="140" width="130" height="34" rx="8" fill="#f4f6fa" stroke="#d9dee6"/><text x="75" y="162" text-anchor="middle" data-i18n="net.archTheory">theory (one-hot ×3)</text>
+          <rect x="180" y="30" width="80" height="160" rx="10" fill="#0b1d3a"/><text x="220" y="105" text-anchor="middle" fill="#fff">128</text><text x="220" y="124" text-anchor="middle" fill="#9fb0d4" font-size="12">exp(−x²)</text>
+          <rect x="305" y="30" width="80" height="160" rx="10" fill="#0b1d3a"/><text x="345" y="105" text-anchor="middle" fill="#fff">128</text><text x="345" y="124" text-anchor="middle" fill="#9fb0d4" font-size="12">exp(−x²)</text>
+          <rect x="420" y="92" width="90" height="36" rx="8" fill="#fff4dc" stroke="#f5a524"/><text x="465" y="115" text-anchor="middle">log₁₀ σ</text>
+        </g>
+        <g stroke="#5b6475" stroke-width="1.5" fill="none"><path d="M140 57 L180 100"/><path d="M140 107 L180 110"/><path d="M140 157 L180 120"/><path d="M260 110 L305 110"/><path d="M385 110 L420 110"/></g>
+        <text x="260" y="235" text-anchor="middle" font-size="13" fill="#5b6475" data-i18n="net.archCaption">5 inputs → 128 → 128 → 1 output</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Experimental data ================= -->
+<section class="block" id="data">
+  <p class="eyebrow" data-i18n="data.eyebrow">Experimental data</p>
+  <h2 data-i18n="data.title">Measurements to compare with</h2>
+  <p class="intro" data-i18n-html="data.intro"></p>
+  <div class="table-wrap"><table class="data">
+    <thead><tr><th data-i18n="data.ref">Reference</th><th data-i18n="data.proj">Projectile</th><th class="num" data-i18n="data.energies">Energies (keV/u)</th><th class="num" data-i18n="data.points">Points</th><th>DOI</th></tr></thead>
+    <tbody id="data-table"></tbody>
+  </table></div>
+</section>
+
+<!-- ================= Cite ================= -->
+<section class="block" id="cite">
+  <p class="eyebrow" data-i18n="cite.eyebrow">How to cite</p>
+  <h2 data-i18n="cite.title">If you use these results</h2>
+  <p class="intro" data-i18n="cite.intro">Please cite the software and the paper that describes it:</p>
+  <div class="cite-box">
+    <p id="cite-text">Monti, J. M., Quinto, M. A., &amp; López, S. D. (2026). <em>ACSNN Calculator: Atomic Collision Surrogate Neural Network</em> (Version 1.0.0) [Computer software]. https://github.com/juanmontiz/ACSNN_Calculator</p>
+    <button type="button" class="copy" data-copy="cite-text" data-i18n="cite.copy">Copy</button>
+  </div>
+  <div class="cite-box">
+    <p id="cite-paper">Quinto, M. A., Monti, J. M., &amp; López, S. D. ACSNN: Neural Network Surrogates for Ionization Cross Sections in Heavy Ion–Hydrogen Collisions (<span data-i18n="cite.review">under review</span>).</p>
+    <button type="button" class="copy" data-copy="cite-paper" data-i18n="cite.copy">Copy</button>
+  </div>
+  <div class="cite-box">
+<pre id="cite-bib">@software{Monti_ACSNN_Calculator_2026,
+  author  = {Monti, Juan Manuel and Quinto, Michele Arcangelo and L{\'o}pez, Sebasti{\'a}n David},
+  title   = {{ACSNN Calculator: Atomic Collision Surrogate Neural Network}},
+  version = {1.0.0},
+  year    = {2026},
+  license = {MIT},
+  url     = {https://github.com/juanmontiz/ACSNN_Calculator}
+}</pre>
+    <button type="button" class="copy" data-copy="cite-bib" data-i18n="cite.copyBib">Copy BibTeX</button>
+  </div>
+</section>
+</main>
+
+<footer class="site"><div class="inner">
+  <span>ACSNN v1.0.0 · J. M. Monti, M. A. Quinto, S. D. López · Instituto de Física Rosario (CONICET-UNR)</span>
+  <span><a href="https://github.com/juanmontiz/ACSNN_Calculator" target="_blank" rel="noopener">GitHub</a> <span data-i18n="footer.license">(MIT license)</span> ·
+    <a href="mailto:monti@ifir-conicet.gov.ar">monti@ifir-conicet.gov.ar</a></span>
+  <span class="small" data-i18n="footer.privacy">All calculations run in your browser; no data is sent to any server.</span>
+</div></footer>
+
+<!-- ================= Appearance drawer ================= -->
+<aside class="drawer" id="drawer" data-i18n-aria="drawer.title" aria-label="Plot appearance">
+  <header><b data-i18n="drawer.title">⚙ Plot appearance</b><button type="button" id="drawer-close" data-i18n-aria="drawer.close" aria-label="Close">✕</button></header>
+  <div class="body">
+    <h4 data-i18n="drawer.axes">Axes and units</h4>
+    <div class="two">
+      <div class="f"><span class="lbl" data-i18n="drawer.xscale">X axis</span><div class="seg" id="xscale-seg"><button type="button" data-v="log" aria-pressed="true">log</button><button type="button" data-v="linear" aria-pressed="false" data-i18n="drawer.linear">linear</button></div></div>
+      <div class="f"><span class="lbl" data-i18n="drawer.yscale">Y axis</span><div class="seg" id="yscale-seg"><button type="button" data-v="log" aria-pressed="true">log</button><button type="button" data-v="linear" aria-pressed="false" data-i18n="drawer.linear">linear</button></div></div>
+    </div>
+    <div class="f"><label for="unit" data-i18n="drawer.units">Units</label>
+      <select id="unit"><option value="cm2">cm²</option><option value="m2">m²</option><option value="Mb">Mb</option><option value="a02">a₀²</option></select></div>
+    <div class="f"><label for="npts" data-i18n="drawer.npts">Points per curve</label>
+      <div class="row"><input type="range" id="npts" min="20" max="1000" value="300"><span class="val" id="npts-val">300</span></div></div>
+    <h4 data-i18n="drawer.styleHead">Style</h4>
+    <div class="f"><label for="style" data-i18n="drawer.style">Plot style</label>
+      <select id="style"><option value="clean" data-i18n="style.clean">Clean</option><option value="journal" data-i18n="style.journal">Journal (black axes, no grid)</option><option value="plotly" data-i18n="style.plotly">Plotly (light-blue background)</option></select></div>
+    <div class="f"><label for="legend" data-i18n="drawer.legend">Legend</label>
+      <select id="legend"><option value="inside" data-i18n="legend.inside">Inside (top right)</option><option value="outside" data-i18n="legend.outside">Outside (right)</option><option value="below" data-i18n="legend.below">Below the plot</option></select></div>
+    <div class="f"><label for="height" data-i18n="drawer.height">Plot height (px)</label><input type="number" id="height" value="520" min="300" max="1200" step="20"></div>
+    <p class="live" data-i18n="drawer.live">Changes apply immediately; each curve's color and line style are set in its chip.</p>
+  </div>
+</aside>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<noscript><p>This page needs JavaScript. / Esta página necesita JavaScript.</p></noscript>
+
+<script src="plotly.min.js"></script>
+<script src="plotly-locale-es.js"></script>
+<script src="jspdf.umd.min.js"></script>
+<script src="svg2pdf.umd.min.js"></script>
+<script src="model_weights.js"></script>
+<script src="exp_data.js"></script>
+<script src="acsnn_model.js"></script>
+<script src="views.js"></script>
+<script src="i18n.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
