@@ -265,9 +265,11 @@
       `# ACSNN Calculator v${model.version}, target: atomic hydrogen (Zt = 1)`,
       `# Training ranges: ${ranges}`,
       "# Empty value = outside training range (extrapolation unreliable)",
-      ["E[keV/u]"].concat(state.curves.map((c) => `TCS_${c.func}_Zp${c.zp}_Zt1[${unit.csv}]`)).join(",")
+      "# Validity: valid | outside_validity (value returned but theory outside its physical validity domain) | outside_training (no value)",
+      ["E[keV/u]"].concat(state.curves.flatMap((c) => [`TCS_${c.func}_Zp${c.zp}_Zt1[${unit.csv}]`, `Validity_${c.func}_Zp${c.zp}`])).join(",")
     ];
-    x.forEach((e, i) => lines.push([e.toPrecision(10)].concat(cols.map((col) => (isNaN(col[i]) ? "" : col[i].toPrecision(10)))).join(",")));
+    const flags = state.curves.map((c) => model.validity(c.func, c.zp, x));
+    x.forEach((e, i) => lines.push([e.toPrecision(10)].concat(cols.flatMap((col, k) => [isNaN(col[i]) ? "" : col[i].toPrecision(10), flags[k][i]])).join(",")));
     return lines.join("\n") + "\n";
   }
 

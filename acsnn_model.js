@@ -8,6 +8,8 @@
 // Trained for atomic hydrogen targets only (Z_target = 1).
 // Like predict_conditional() in Python, returns NaN outside the training energy range
 // of each theory and for Z_projectile above the safe limit.
+// validity() mirrors validity_flags() in Python: "outside_training" (NaN), "outside_validity"
+// (value returned, theory outside its physical validity domain) or "valid".
 (function (root) {
   "use strict";
 
@@ -57,8 +59,28 @@
       });
     }
 
+    // Physical validity domain [min, max] in keV/u (soft limit; see acsnn/config.py)
+    const val = weights.validity;
+    function validityRange(theory, zp) {
+      if (theory === "CDW-EIS") return [val.e_per_au_velocity2 * zp * zp, Infinity];
+      if (theory === "CTMC") return val.ctmc.slice();
+      if (theory === "Semiempiric_1985Rudd") return [0, Infinity];
+      throw new Error("Unknown theory: " + theory);
+    }
+
+    function validity(theory, zp, energies) {
+      const r = validityRange(theory, zp);
+      const zpOk = zp <= zpSafe[theory];
+      return energies.map(function (e) {
+        if (!zpOk || e < eMin[theory] || e > eMax[theory]) return "outside_training";
+        return e <= r[0] || e > r[1] ? "outside_validity" : "valid";
+      });
+    }
+
     return {
       predict: predict,
+      validity: validity,
+      validityRange: validityRange,
       theories: theories,
       trainRange: function (theory) { return [eMin[theory], eMax[theory]]; },
       zpMax: function (theory) { return zpSafe[theory]; },
